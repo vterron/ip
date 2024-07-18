@@ -11,7 +11,7 @@ from queue import Queue
 LOGGER = logging.getLogger(__name__)
 
 URLS = [
-    "https://api.ipify.org",
+    "https://api64.ipify.org",
     "https://checkip.amazonaws.com",
     "https://icanhazip.com",
     "https://ifconfig.co/ip",
@@ -19,6 +19,11 @@ URLS = [
     "https://ipinfo.io/ip",
 ]
 
+IPREQ_EXCEPTIONS = (
+    requests.exceptions.HTTPError, 
+    requests.exceptions.Timeout, 
+    requests.exceptions.ConnectionError, 
+)
 
 def _get_ip(url: str, queue: Queue, timeout: float) -> None:
     """Get external IP from 'url' and put it into 'queue'."""
@@ -29,7 +34,7 @@ def _get_ip(url: str, queue: Queue, timeout: float) -> None:
         ip = r.text.strip()
         LOGGER.debug("Asked %s for our IP -> %s", url, ip)
         queue.put(ip)
-    except (requests.exceptions.HTTPError, requests.exceptions.Timeout):
+    except IPREQ_EXCEPTIONS:
         pass
 
 
