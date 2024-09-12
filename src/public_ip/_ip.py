@@ -7,6 +7,7 @@ import requests
 import threading
 import typing
 from queue import Queue
+from ipaddress import ip_address, IPv4Address 
 
 LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +57,10 @@ def get(nurls: int = len(URLS), timeout: float = 1) -> str:
 
     ips = []
     while not queue.empty():
-        ips.append(queue.get())
+        # Fix error comparing IPv6 and IPv4 (if first_votes == second_votes)
+        ipx = queue.get()
+        if type(ip_address(ipx)) is IPv4Address:
+            ips.append(ipx)
 
     if not ips:
         raise IOError("all server queries failed")
